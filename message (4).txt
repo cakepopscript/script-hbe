@@ -1,0 +1,1633 @@
+-- =================================================================-------
+-- cakepop hbe || have fun!
+-- =================================================================-------
+
+local Players = cloneref(game:GetService('Players'))
+local RunService = cloneref(game:GetService('RunService'))
+local UserInputService = cloneref(game:GetService('UserInputService'))
+local Lighting = cloneref(game:GetService('Lighting'))
+local HttpService = cloneref(game:GetService('HttpService'))
+local TweenService = cloneref(game:GetService('TweenService'))
+
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer or Players.PlayerAdded:Wait()
+local IsMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+
+-- All available visual color palettes for the UI (including Sakura customized to ashy brown and pink)
+local Themes = {
+    Dark = {
+        MainBg = Color3.fromRGB(20, 20, 24),
+        HeaderBg = Color3.fromRGB(26, 26, 32),
+        CardBg = Color3.fromRGB(30, 30, 38),
+        Accent = Color3.fromRGB(0, 162, 255),
+        Text = Color3.fromRGB(240, 240, 245),
+        SubText = Color3.fromRGB(150, 150, 165),
+        Border = Color3.fromRGB(45, 45, 58)
+    },
+    Midnight = {
+        MainBg = Color3.fromRGB(12, 14, 22),
+        HeaderBg = Color3.fromRGB(18, 20, 32),
+        CardBg = Color3.fromRGB(22, 26, 42),
+        Accent = Color3.fromRGB(90, 105, 255),
+        Text = Color3.fromRGB(240, 242, 255),
+        SubText = Color3.fromRGB(130, 140, 175),
+        Border = Color3.fromRGB(35, 42, 65)
+    },
+    Blood = {
+        MainBg = Color3.fromRGB(18, 10, 10),
+        HeaderBg = Color3.fromRGB(28, 16, 16),
+        CardBg = Color3.fromRGB(38, 22, 22),
+        Accent = Color3.fromRGB(204, 0, 0),
+        Text = Color3.fromRGB(240, 230, 230),
+        SubText = Color3.fromRGB(179, 153, 153),
+        Border = Color3.fromRGB(61, 26, 26)
+    },
+    PastelPink = {
+        MainBg = Color3.fromRGB(255, 245, 247),
+        HeaderBg = Color3.fromRGB(255, 235, 239),
+        CardBg = Color3.fromRGB(255, 227, 232),
+        Accent = Color3.fromRGB(255, 133, 161),
+        Text = Color3.fromRGB(74, 46, 53),
+        SubText = Color3.fromRGB(138, 104, 114),
+        Border = Color3.fromRGB(255, 209, 220)
+    },
+    PastelBlue = {
+        MainBg = Color3.fromRGB(240, 244, 248),
+        HeaderBg = Color3.fromRGB(225, 234, 242),
+        CardBg = Color3.fromRGB(217, 226, 236),
+        Accent = Color3.fromRGB(98, 125, 152),
+        Text = Color3.fromRGB(36, 59, 83),
+        SubText = Color3.fromRGB(72, 101, 129),
+        Border = Color3.fromRGB(188, 204, 220)
+    },
+    Emerald = {
+        MainBg = Color3.fromRGB(16, 24, 20),
+        HeaderBg = Color3.fromRGB(22, 32, 26),
+        CardBg = Color3.fromRGB(28, 40, 33),
+        Accent = Color3.fromRGB(46, 204, 113),
+        Text = Color3.fromRGB(240, 250, 245),
+        SubText = Color3.fromRGB(140, 170, 155),
+        Border = Color3.fromRGB(40, 60, 48)
+    },
+    Cyberpunk = {
+        MainBg = Color3.fromRGB(18, 18, 24),
+        HeaderBg = Color3.fromRGB(24, 24, 32),
+        CardBg = Color3.fromRGB(32, 32, 44),
+        Accent = Color3.fromRGB(255, 0, 110),
+        Text = Color3.fromRGB(255, 255, 255),
+        SubText = Color3.fromRGB(160, 160, 190),
+        Border = Color3.fromRGB(65, 65, 90)
+    },
+    Monochrome = {
+        MainBg = Color3.fromRGB(18, 18, 18),
+        HeaderBg = Color3.fromRGB(26, 26, 26),
+        CardBg = Color3.fromRGB(34, 34, 34),
+        Accent = Color3.fromRGB(230, 230, 230),
+        Text = Color3.fromRGB(255, 255, 255),
+        SubText = Color3.fromRGB(160, 160, 160),
+        Border = Color3.fromRGB(55, 55, 55)
+    },
+    -- Sakura customized to ashy brown tree bark & pink blossoms
+    Sakura = {
+        MainBg = Color3.fromRGB(42, 37, 36),      -- Ashy dark brown background
+        HeaderBg = Color3.fromRGB(52, 45, 44),    -- Muted ashy brown header
+        CardBg = Color3.fromRGB(64, 56, 54),      -- Soft ashy wood card tone
+        Accent = Color3.fromRGB(255, 153, 182),   -- Soft vibrant Sakura pink blossom accent
+        Text = Color3.fromRGB(255, 235, 238),     -- Light petal white-pink text
+        SubText = Color3.fromRGB(196, 178, 176),  -- Desaturated ashy grayish-brown subtext
+        Border = Color3.fromRGB(89, 77, 75)       -- Ashy brown outline border
+    },
+    Sunset = {
+        MainBg = Color3.fromRGB(24, 15, 22),
+        HeaderBg = Color3.fromRGB(34, 21, 31),
+        CardBg = Color3.fromRGB(46, 28, 41),
+        Accent = Color3.fromRGB(255, 110, 80),
+        Text = Color3.fromRGB(255, 235, 225),
+        SubText = Color3.fromRGB(185, 140, 135),
+        Border = Color3.fromRGB(75, 45, 65)
+    },
+    Matrix = {
+        MainBg = Color3.fromRGB(10, 18, 12),
+        HeaderBg = Color3.fromRGB(14, 26, 17),
+        CardBg = Color3.fromRGB(18, 36, 23),
+        Accent = Color3.fromRGB(0, 255, 65),
+        Text = Color3.fromRGB(210, 255, 220),
+        SubText = Color3.fromRGB(100, 165, 115),
+        Border = Color3.fromRGB(28, 65, 38)
+    },
+    Lavender = {
+        MainBg = Color3.fromRGB(242, 240, 247),
+        HeaderBg = Color3.fromRGB(230, 227, 240),
+        CardBg = Color3.fromRGB(218, 213, 232),
+        Accent = Color3.fromRGB(139, 110, 204),
+        Text = Color3.fromRGB(54, 46, 74),
+        SubText = Color3.fromRGB(112, 101, 138),
+        Border = Color3.fromRGB(195, 187, 217)
+    },
+    Solarized = {
+        MainBg = Color3.fromRGB(24, 32, 38),
+        HeaderBg = Color3.fromRGB(31, 42, 50),
+        CardBg = Color3.fromRGB(38, 52, 63),
+        Accent = Color3.fromRGB(181, 137, 0),
+        Text = Color3.fromRGB(238, 232, 213),
+        SubText = Color3.fromRGB(131, 148, 150),
+        Border = Color3.fromRGB(65, 88, 104)
+    },
+    Coffee = {
+        MainBg = Color3.fromRGB(26, 20, 18),
+        HeaderBg = Color3.fromRGB(36, 28, 25),
+        CardBg = Color3.fromRGB(48, 38, 34),
+        Accent = Color3.fromRGB(212, 163, 89),
+        Text = Color3.fromRGB(245, 235, 224),
+        SubText = Color3.fromRGB(168, 150, 138),
+        Border = Color3.fromRGB(74, 58, 52)
+    },
+    NeonMint = {
+        MainBg = Color3.fromRGB(12, 24, 20),
+        HeaderBg = Color3.fromRGB(18, 36, 30),
+        CardBg = Color3.fromRGB(24, 48, 40),
+        Accent = Color3.fromRGB(0, 255, 178),
+        Text = Color3.fromRGB(220, 255, 245),
+        SubText = Color3.fromRGB(115, 175, 155),
+        Border = Color3.fromRGB(40, 80, 68)
+    },
+    RoyalGold = {
+        MainBg = Color3.fromRGB(20, 18, 14),
+        HeaderBg = Color3.fromRGB(28, 25, 18),
+        CardBg = Color3.fromRGB(38, 34, 24),
+        Accent = Color3.fromRGB(255, 215, 0),
+        Text = Color3.fromRGB(255, 248, 220),
+        SubText = Color3.fromRGB(180, 165, 120),
+        Border = Color3.fromRGB(65, 58, 40)
+    }
+}
+
+-- def preferences and configs
+local Settings = {
+    Theme = "Sakura", -- Defaults to the updated Ashy Sakura palette!
+    HitboxEnabled = false,
+    TargetNPCs = false,
+    RageMode = false,
+    OutlineEnabled = false,
+    HitboxSize = 5,
+    HitboxColor = {255, 153, 182},
+    HitboxOpacity = 0.5,
+    OutlineColor = {64, 56, 54},
+    OutlineThickness = 0.05,
+    OutlineOpacity = 1,
+    ToggleKey = "RightShift",
+    FogStart = Lighting.FogStart,
+    FogEnd = Lighting.FogEnd,
+    FogColor = {math.floor(Lighting.FogColor.R * 255), math.floor(Lighting.FogColor.G * 255), math.floor(Lighting.FogColor.B * 255)},
+    Ambient = {math.floor(Lighting.Ambient.R * 255), math.floor(Lighting.Ambient.G * 255), math.floor(Lighting.Ambient.B * 255)},
+    OutdoorAmbient = {math.floor(Lighting.OutdoorAmbient.R * 255), math.floor(Lighting.OutdoorAmbient.G * 255), math.floor(Lighting.OutdoorAmbient.B * 255)},
+    AutoLoad = false,
+    Autosave = false,
+    Headless = false,
+    SpeedEnabled = false,
+    SpeedValue = 24,
+    SpeedKey = "Q",
+    FlyEnabled = false,
+    FlySpeed = 50,
+    FlyKey = "F"
+}
+
+local CurrentTheme = Themes[Settings.Theme]
+local ThemeObjects = { MainBg = {}, HeaderBg = {}, CardBg = {}, Accent = {}, Text = {}, SubText = {}, Border = {} }
+
+local function TrackThemeElement(element, property, category)
+    table.insert(ThemeObjects[category], {Object = element, Property = property})
+    element[property] = CurrentTheme[category]
+end
+
+local function SwitchTheme(themeName)
+    if not Themes[themeName] then return end
+    Settings.Theme = themeName
+    CurrentTheme = Themes[themeName]
+    for category, items in pairs(ThemeObjects) do
+        for _, item in ipairs(items) do
+            if item.Object and item.Object.Parent then
+                item.Object[item.Property] = CurrentTheme[category]
+            end
+        end
+    end
+end
+
+-- sgui setup
+local ScreenGui = Instance.new('ScreenGui')
+ScreenGui.Name = 'CakepopHitboxUI'
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = LocalPlayer:WaitForChild('PlayerGui')
+
+-- buttonanim
+local function AddButtonEffects(button)
+    local gradient = Instance.new('UIGradient')
+    gradient.Rotation = 90
+    gradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)),
+        ColorSequenceKeypoint.new(0.40, Color3.fromRGB(230, 230, 235)),
+        ColorSequenceKeypoint.new(1.00, Color3.fromRGB(160, 160, 175))
+    }
+    gradient.Parent = button
+
+    local tweenInfo = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
+    button.MouseButton1Down:Connect(function()
+        local originalSize = button.Size
+        button:SetAttribute("OrigSize", originalSize)
+        TweenService:Create(button, tweenInfo, {
+            Size = UDim2.new(originalSize.X.Scale * 0.96, originalSize.X.Offset * 0.96, originalSize.Y.Scale * 0.96, originalSize.Y.Offset * 0.96)
+        }):Play()
+    end)
+    
+    local function restoreSize()
+        local originalSize = button:GetAttribute("OrigSize")
+        if originalSize then
+            TweenService:Create(button, tweenInfo, {Size = originalSize}):Play()
+        end
+    end
+
+    button.MouseButton1Up:Connect(restoreSize)
+    button.MouseLeave:Connect(restoreSize)
+end
+
+-- config file saving and loading
+local function SaveConfig()
+    local encodedData = HttpService:JSONEncode(Settings)
+    if writefile then
+        pcall(function() writefile("CakepopHitbox_Config.json", encodedData) end)
+    end
+end
+
+local function LoadConfig()
+    local rawData = nil
+    if readfile and isfile and isfile("CakepopHitbox_Config.json") then
+        pcall(function() rawData = readfile("CakepopHitbox_Config.json") end)
+    end
+    
+    if rawData then
+        local success, decoded = pcall(function() return HttpService:JSONDecode(rawData) end)
+        if success and type(decoded) == "table" then
+            for key, value in pairs(decoded) do Settings[key] = value end
+            if Settings.Theme and Themes[Settings.Theme] then SwitchTheme(Settings.Theme) end
+            Lighting.FogStart = Settings.FogStart
+            Lighting.FogEnd = Settings.FogEnd
+            Lighting.FogColor = Color3.fromRGB(unpack(Settings.FogColor))
+            Lighting.Ambient = Color3.fromRGB(unpack(Settings.Ambient))
+            Lighting.OutdoorAmbient = Color3.fromRGB(unpack(Settings.OutdoorAmbient))
+        end
+    end
+end
+
+-- autoloadcheck
+local startupConfig = nil
+if readfile and isfile and isfile("CakepopHitbox_Config.json") then
+    pcall(function() startupConfig = readfile("CakepopHitbox_Config.json") end)
+end
+if startupConfig then
+    pcall(function()
+        local data = HttpService:JSONDecode(startupConfig)
+        if data and data.AutoLoad then LoadConfig() end
+    end)
+end
+
+-- mainframe
+local MainWindow = Instance.new('Frame')
+MainWindow.Size = UDim2.new(0, 440, 0, 380)
+MainWindow.Position = UDim2.new(0.5, -220, 0.25, 0)
+MainWindow.BorderSizePixel = 0
+MainWindow.Active = true
+MainWindow.ClipsDescendants = true
+MainWindow.Parent = ScreenGui
+TrackThemeElement(MainWindow, "BackgroundColor3", "MainBg")
+
+local ContainerGroup = Instance.new('CanvasGroup')
+ContainerGroup.Size = UDim2.new(1, 0, 1, 0)
+ContainerGroup.BackgroundTransparency = 1
+ContainerGroup.Parent = MainWindow
+
+local WindowCorner = Instance.new('UICorner')
+WindowCorner.CornerRadius = UDim.new(0, 24)
+WindowCorner.Parent = MainWindow
+
+local WindowStroke = Instance.new('UIStroke')
+WindowStroke.Thickness = 0.8
+WindowStroke.Parent = MainWindow
+TrackThemeElement(WindowStroke, "Color", "Border")
+
+local HeaderBar = Instance.new('Frame')
+HeaderBar.Size = UDim2.new(1, 0, 0, 42)
+HeaderBar.BackgroundTransparency = 1
+HeaderBar.Parent = ContainerGroup
+
+-- windrag
+local isDraggingWindow, dragInputStart, windowStartPos
+HeaderBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        isDraggingWindow = true
+        dragInputStart = input.Position
+        windowStartPos = MainWindow.Position
+        
+        local connection
+        connection = input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                isDraggingWindow = false
+                connection:Disconnect()
+            end
+        end)
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if isDraggingWindow and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragInputStart
+        MainWindow.Position = UDim2.new(windowStartPos.X.Scale, windowStartPos.X.Offset + delta.X, windowStartPos.Y.Scale, windowStartPos.Y.Offset + delta.Y)
+    end
+end)
+
+local AccentLine = Instance.new('Frame')
+AccentLine.Size = UDim2.new(1, -28, 0, 2)
+AccentLine.Position = UDim2.new(0, 14, 0, 4)
+AccentLine.BorderSizePixel = 0
+AccentLine.Parent = HeaderBar
+TrackThemeElement(AccentLine, "BackgroundColor3", "Accent")
+
+local LineCorner = Instance.new('UICorner')
+LineCorner.CornerRadius = UDim.new(1, 0)
+LineCorner.Parent = AccentLine
+
+local LineGradient = Instance.new('UIGradient')
+LineGradient.Transparency = NumberSequence.new{
+    NumberSequenceKeypoint.new(0.00, 1.00),
+    NumberSequenceKeypoint.new(0.20, 0.00),
+    NumberSequenceKeypoint.new(0.80, 0.00),
+    NumberSequenceKeypoint.new(1.00, 1.00)
+}
+LineGradient.Parent = AccentLine
+
+local WindowTitle = Instance.new('TextLabel')
+WindowTitle.Size = UDim2.new(0, 250, 1, -3)
+WindowTitle.Position = UDim2.new(0, 16, 0, 3)
+WindowTitle.BackgroundTransparency = 1
+WindowTitle.Text = 'Cakepop Hitbox Expander'
+WindowTitle.Font = Enum.Font.GothamBold
+WindowTitle.TextSize = 13
+WindowTitle.TextXAlignment = Enum.TextXAlignment.Left
+WindowTitle.Parent = HeaderBar
+TrackThemeElement(WindowTitle, "TextColor3", "Text")
+
+local KeybindButton = Instance.new('TextButton')
+KeybindButton.Size = UDim2.new(0, 85, 0, 22)
+KeybindButton.Position = UDim2.new(1, -95, 0.26, 0)
+KeybindButton.BorderSizePixel = 0
+KeybindButton.Font = Enum.Font.Gotham
+KeybindButton.TextSize = 10
+KeybindButton.Parent = HeaderBar
+TrackThemeElement(KeybindButton, "BackgroundColor3", "CardBg")
+TrackThemeElement(KeybindButton, "TextColor3", "SubText")
+AddButtonEffects(KeybindButton)
+
+local KeybindCorner = Instance.new('UICorner')
+KeybindCorner.CornerRadius = UDim.new(1, 0)
+KeybindCorner.Parent = KeybindButton
+
+local KeybindStroke = Instance.new('UIStroke')
+KeybindStroke.Thickness = 0.8
+KeybindStroke.Parent = KeybindButton
+TrackThemeElement(KeybindStroke, "Color", "Border")
+
+-- wintoggle
+local isUIVisible = true
+local isTweeningWindow = false
+local normalPosition = UDim2.new(0.5, -220, 0.25, 0)
+local hiddenPosition = UDim2.new(0.5, -220, 0.25, 20)
+
+local function ToggleWindowVisibility(show)
+    if isTweeningWindow or isUIVisible == show then return end
+    isTweeningWindow = true
+
+    if show then
+        MainWindow.Visible = true
+        MainWindow.Size = UDim2.new(0, 440 * 0.85, 0, 380 * 0.85)
+        MainWindow.Position = hiddenPosition
+        MainWindow.BackgroundTransparency = 1
+        ContainerGroup.GroupTransparency = 1
+        
+        TweenService:Create(MainWindow, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { BackgroundTransparency = 0 }):Play()
+        TweenService:Create(ContainerGroup, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { GroupTransparency = 0 }):Play()
+
+        local popIn = TweenService:Create(MainWindow, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+            Size = UDim2.new(0, 440, 0, 380),
+            Position = normalPosition
+        })
+        popIn:Play()
+        popIn.Completed:Wait()
+        isUIVisible = true
+    else
+        TweenService:Create(MainWindow, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), { BackgroundTransparency = 1 }):Play()
+        TweenService:Create(ContainerGroup, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), { GroupTransparency = 1 }):Play()
+
+        local popOut = TweenService:Create(MainWindow, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            Size = UDim2.new(0, 440 * 0.85, 0, 380 * 0.85),
+            Position = hiddenPosition
+        })
+        popOut:Play()
+        popOut.Completed:Wait()
+        MainWindow.Visible = false
+        isUIVisible = false
+    end
+
+    isTweeningWindow = false
+end
+
+-- openanim
+MainWindow.Size = UDim2.new(0, 440 * 0.8, 0, 380 * 0.8)
+MainWindow.Position = hiddenPosition
+MainWindow.BackgroundTransparency = 1
+ContainerGroup.GroupTransparency = 1
+
+TweenService:Create(MainWindow, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { BackgroundTransparency = 0 }):Play()
+TweenService:Create(ContainerGroup, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { GroupTransparency = 0 }):Play()
+TweenService:Create(MainWindow, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+    Size = UDim2.new(0, 440, 0, 380),
+    Position = normalPosition
+}):Play()
+
+local isBindingKey = false
+local MobileMenuButton = nil
+
+if IsMobile then
+    KeybindButton.Visible = false
+    
+    MobileMenuButton = Instance.new('TextButton')
+    MobileMenuButton.Size = UDim2.new(0, 90, 0, 32)
+    MobileMenuButton.Position = UDim2.new(0.05, 0, 0.2, 0)
+    MobileMenuButton.Text = 'Toggle UI'
+    MobileMenuButton.Font = Enum.Font.GothamBold
+    MobileMenuButton.TextSize = 11
+    MobileMenuButton.Parent = ScreenGui
+    TrackThemeElement(MobileMenuButton, "BackgroundColor3", "HeaderBg")
+    TrackThemeElement(MobileMenuButton, "TextColor3", "Text")
+    AddButtonEffects(MobileMenuButton)
+    
+    local mobileCorner = Instance.new('UICorner')
+    mobileCorner.CornerRadius = UDim.new(1, 0)
+    mobileCorner.Parent = MobileMenuButton
+    
+    local mobileStroke = Instance.new('UIStroke')
+    mobileStroke.Thickness = 0.8
+    mobileStroke.Parent = MobileMenuButton
+    TrackThemeElement(mobileStroke, "Color", "Accent")
+
+    MobileMenuButton.MouseButton1Click:Connect(function()
+        ToggleWindowVisibility(not isUIVisible)
+    end)
+else
+    KeybindButton.Text = Settings.ToggleKey
+    KeybindButton.MouseButton1Click:Connect(function()
+        isBindingKey = true
+        KeybindButton.Text = 'Press Key...'
+    end)
+end
+
+-- nav setup
+local TabContainer = Instance.new('Frame')
+TabContainer.Size = UDim2.new(1, -28, 0, 28)
+TabContainer.Position = UDim2.new(0, 14, 0, 52)
+TabContainer.BackgroundTransparency = 1
+TabContainer.Parent = ContainerGroup
+
+local totalTabs = if IsMobile then 3 else 4
+local tabWidthPercentage = (1 / totalTabs) - 0.012
+
+local function BuildTabButton(title, position)
+    local button = Instance.new('TextButton')
+    button.Size = UDim2.new(tabWidthPercentage, 0, 1, 0)
+    button.Position = position
+    button.BorderSizePixel = 0
+    button.Text = title
+    button.Font = Enum.Font.GothamBold
+    button.TextSize = 9
+    button.Parent = TabContainer
+    AddButtonEffects(button)
+    
+    local corner = Instance.new('UICorner')
+    corner.CornerRadius = UDim.new(1, 0)
+    corner.Parent = button
+
+    local stroke = Instance.new('UIStroke')
+    stroke.Thickness = 0.8
+    stroke.Parent = button
+    TrackThemeElement(stroke, "Color", "Border")
+
+    return button
+end
+
+local HitboxTabBtn = BuildTabButton('Hitbox', UDim2.new(0, 0, 0, 0))
+TrackThemeElement(HitboxTabBtn, "BackgroundColor3", "Accent")
+TrackThemeElement(HitboxTabBtn, "TextColor3", "Text")
+
+local PlayerTabBtn = BuildTabButton('Player', UDim2.new(tabWidthPercentage + 0.015, 0, 0, 0))
+TrackThemeElement(PlayerTabBtn, "BackgroundColor3", "CardBg")
+TrackThemeElement(PlayerTabBtn, "TextColor3", "SubText")
+
+local LightingTabBtn = BuildTabButton('Lighting', UDim2.new((tabWidthPercentage + 0.015) * 2, 0, 0, 0))
+TrackThemeElement(LightingTabBtn, "BackgroundColor3", "CardBg")
+TrackThemeElement(LightingTabBtn, "TextColor3", "SubText")
+
+local SettingsTabBtn
+if not IsMobile then
+    SettingsTabBtn = BuildTabButton('Settings', UDim2.new((tabWidthPercentage + 0.015) * 3, 0, 0, 0))
+    TrackThemeElement(SettingsTabBtn, "BackgroundColor3", "CardBg")
+    TrackThemeElement(SettingsTabBtn, "TextColor3", "SubText")
+end
+
+-- pagecontain
+local function MakeScrollingPage()
+    local page = Instance.new('ScrollingFrame')
+    page.Size = UDim2.new(1, -28, 1, -92)
+    page.Position = UDim2.new(0, 14, 0, 86)
+    page.BackgroundTransparency = 1
+    page.ScrollBarThickness = 2
+    page.Visible = false
+    page.Parent = ContainerGroup
+    return page
+end
+
+local HitboxPage = MakeScrollingPage()
+HitboxPage.Visible = true -- Default active page
+local PlayerPage = MakeScrollingPage()
+local LightingPage = MakeScrollingPage()
+local SettingsPage = not IsMobile and MakeScrollingPage() or nil
+
+local function InitializePageLayout(page)
+    local layout = Instance.new('UIListLayout')
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Padding = UDim.new(0, 6)
+    layout.Parent = page
+    
+    layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        page.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 10)
+    end)
+end
+
+InitializePageLayout(HitboxPage)
+InitializePageLayout(PlayerPage)
+InitializePageLayout(LightingPage)
+if SettingsPage then InitializePageLayout(SettingsPage) end
+
+-- colourpick
+local ColorPickerModal = Instance.new('Frame')
+ColorPickerModal.Size = UDim2.new(0, 175, 0, 185)
+ColorPickerModal.BorderSizePixel = 0
+ColorPickerModal.Visible = false
+ColorPickerModal.ZIndex = 20
+ColorPickerModal.Active = true
+ColorPickerModal.Draggable = true
+ColorPickerModal.Parent = ScreenGui
+TrackThemeElement(ColorPickerModal, "BackgroundColor3", "HeaderBg")
+
+local ModalCorner = Instance.new('UICorner')
+ModalCorner.CornerRadius = UDim.new(0, 20)
+ModalCorner.Parent = ColorPickerModal
+
+local ModalStroke = Instance.new('UIStroke')
+ModalStroke.Thickness = 0.8
+ModalStroke.Parent = ColorPickerModal
+TrackThemeElement(ModalStroke, "Color", "Border")
+
+local ModalHeader = Instance.new('Frame')
+ModalHeader.Size = UDim2.new(1, 0, 0, 24)
+ModalHeader.BackgroundTransparency = 1
+ModalHeader.ZIndex = 21
+ModalHeader.Parent = ColorPickerModal
+
+local ModalTitle = Instance.new('TextLabel')
+ModalTitle.Size = UDim2.new(1, -26, 1, 0)
+ModalTitle.Position = UDim2.new(0, 12, 0, 0)
+ModalTitle.BackgroundTransparency = 1
+ModalTitle.Text = "Color Picker"
+ModalTitle.Font = Enum.Font.GothamBold
+ModalTitle.TextSize = 10
+ModalTitle.TextXAlignment = Enum.TextXAlignment.Left
+ModalTitle.ZIndex = 21
+ModalTitle.Parent = ModalHeader
+TrackThemeElement(ModalTitle, "TextColor3", "SubText")
+
+local CloseModalBtn = Instance.new('TextButton')
+CloseModalBtn.Size = UDim2.new(0, 18, 0, 18)
+CloseModalBtn.Position = UDim2.new(1, -21, 0, 3)
+CloseModalBtn.Text = "X"
+CloseModalBtn.Font = Enum.Font.GothamBold
+CloseModalBtn.TextSize = 11
+CloseModalBtn.ZIndex = 22
+CloseModalBtn.BackgroundTransparency = 1
+CloseModalBtn.Parent = ModalHeader
+TrackThemeElement(CloseModalBtn, "TextColor3", "SubText")
+
+local ColorSquare = Instance.new('Frame')
+ColorSquare.Size = UDim2.new(0, 130, 0, 125)
+ColorSquare.Position = UDim2.new(0, 8, 0, 26)
+ColorSquare.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+ColorSquare.BorderSizePixel = 0
+ColorSquare.ZIndex = 21
+ColorSquare.Parent = ColorPickerModal
+
+local SquareCorner = Instance.new('UICorner')
+SquareCorner.CornerRadius = UDim.new(0, 12)
+SquareCorner.Parent = ColorSquare
+
+local SaturationOverlay = Instance.new('Frame')
+SaturationOverlay.Size = UDim2.new(1, 0, 1, 0)
+SaturationOverlay.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+SaturationOverlay.BorderSizePixel = 0
+SaturationOverlay.ZIndex = 22
+SaturationOverlay.Parent = ColorSquare
+
+local SatCorner = Instance.new('UICorner')
+SatCorner.CornerRadius = UDim.new(0, 12)
+SatCorner.Parent = SaturationOverlay
+
+local SatGradient = Instance.new('UIGradient')
+SatGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255))
+}
+SatGradient.Transparency = NumberSequence.new{
+    NumberSequenceKeypoint.new(0, 0),
+    NumberSequenceKeypoint.new(1, 1)
+}
+SatGradient.Parent = SaturationOverlay
+
+local ValueOverlay = Instance.new('Frame')
+ValueOverlay.Size = UDim2.new(1, 0, 1, 0)
+ValueOverlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+ValueOverlay.BorderSizePixel = 0
+ValueOverlay.ZIndex = 23
+ValueOverlay.Parent = ColorSquare
+
+local ValueCorner = Instance.new('UICorner')
+ValueCorner.CornerRadius = UDim.new(0, 12)
+ValueCorner.Parent = ValueOverlay
+
+local ValueGradient = Instance.new('UIGradient')
+ValueGradient.Rotation = 90
+ValueGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 0, 0)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))
+}
+ValueGradient.Transparency = NumberSequence.new{
+    NumberSequenceKeypoint.new(0, 1),
+    NumberSequenceKeypoint.new(1, 0)
+}
+ValueGradient.Parent = ValueOverlay
+
+local HueBar = Instance.new('Frame')
+HueBar.Size = UDim2.new(0, 14, 0, 125)
+HueBar.Position = UDim2.new(0, 148, 0, 26)
+HueBar.BorderSizePixel = 0
+HueBar.ZIndex = 21
+HueBar.Parent = ColorPickerModal
+
+local HueCorner = Instance.new('UICorner')
+HueCorner.CornerRadius = UDim.new(1, 0)
+HueCorner.Parent = HueBar
+
+local HueGradient = Instance.new('UIGradient')
+HueGradient.Rotation = 90
+HueGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 0, 0)),
+    ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 255, 0)),
+    ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
+    ColorSequenceKeypoint.new(0.50, Color3.fromRGB(0, 255, 255)),
+    ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 0, 255)),
+    ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 0, 255)),
+    ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 0, 0))
+}
+HueGradient.Parent = HueBar
+
+local ActiveColorCallback = nil
+local activeHue, activeSat, activeVal = 0, 1, 1
+
+local function RefreshColorPicker()
+    ColorSquare.BackgroundColor3 = Color3.fromHSV(activeHue, 1, 1)
+    local selectedColor = Color3.fromHSV(activeHue, activeSat, activeVal)
+    if ActiveColorCallback then
+        ActiveColorCallback(selectedColor)
+    end
+end
+
+CloseModalBtn.MouseButton1Click:Connect(function()
+    ColorPickerModal.Visible = false
+end)
+
+local isDraggingHueBar = false
+HueBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        isDraggingHueBar = true
+        local relativeY = math.clamp((input.Position.Y - HueBar.AbsolutePosition.Y) / HueBar.AbsoluteSize.Y, 0, 1)
+        activeHue = relativeY
+        RefreshColorPicker()
+    end
+end)
+
+local isDraggingSquare = false
+ColorSquare.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        isDraggingSquare = true
+        local relativeX = math.clamp((input.Position.X - ColorSquare.AbsolutePosition.X) / ColorSquare.AbsoluteSize.X, 0, 1)
+        local relativeY = math.clamp((input.Position.Y - ColorSquare.AbsolutePosition.Y) / ColorSquare.AbsoluteSize.Y, 0, 1)
+        activeSat = relativeX
+        activeVal = 1 - relativeY
+        RefreshColorPicker()
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if isDraggingHueBar and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local relativeY = math.clamp((input.Position.Y - HueBar.AbsolutePosition.Y) / HueBar.AbsoluteSize.Y, 0, 1)
+        activeHue = relativeY
+        RefreshColorPicker()
+    elseif isDraggingSquare and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local relativeX = math.clamp((input.Position.X - ColorSquare.AbsolutePosition.X) / ColorSquare.AbsoluteSize.X, 0, 1)
+        local relativeY = math.clamp((input.Position.Y - ColorSquare.AbsolutePosition.Y) / ColorSquare.AbsoluteSize.Y, 0, 1)
+        activeSat = relativeX
+        activeVal = 1 - relativeY
+        RefreshColorPicker()
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        isDraggingHueBar = false
+        isDraggingSquare = false
+    end
+end)
+
+-- UI Component Builders
+local function BuildToggle(parent, labelText, initialValue, callback)
+    local Frame = Instance.new('Frame')
+    Frame.Size = UDim2.new(1, 0, 0, 30)
+    Frame.BorderSizePixel = 0
+    Frame.Parent = parent
+    TrackThemeElement(Frame, "BackgroundColor3", "CardBg")
+
+    local Corner = Instance.new('UICorner')
+    Corner.CornerRadius = UDim.new(0, 8)
+    Corner.Parent = Frame
+
+    local Stroke = Instance.new('UIStroke')
+    Stroke.Thickness = 0.8
+    Stroke.Parent = Frame
+    TrackThemeElement(Stroke, "Color", "Border")
+
+    local Label = Instance.new('TextLabel')
+    Label.Size = UDim2.new(0.6, 0, 1, 0)
+    Label.Position = UDim2.new(0, 12, 0, 0)
+    Label.BackgroundTransparency = 1
+    Label.Text = labelText
+    Label.Font = Enum.Font.Gotham
+    Label.TextSize = 10
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+    Label.Parent = Frame
+    TrackThemeElement(Label, "TextColor3", "Text")
+
+    local ToggleButton = Instance.new('TextButton')
+    ToggleButton.Size = UDim2.new(0, 34, 0, 18)
+    ToggleButton.Position = UDim2.new(1, -42, 0.5, -9)
+    ToggleButton.BorderSizePixel = 0
+    ToggleButton.Text = ""
+    ToggleButton.Parent = Frame
+    AddButtonEffects(ToggleButton)
+
+    local ToggleCorner = Instance.new('UICorner')
+    ToggleCorner.CornerRadius = UDim.new(1, 0)
+    ToggleCorner.Parent = ToggleButton
+
+    local Circle = Instance.new('Frame')
+    Circle.Size = UDim2.new(0, 12, 0, 12)
+    Circle.BorderSizePixel = 0
+    Circle.Parent = ToggleButton
+    TrackThemeElement(Circle, "BackgroundColor3", "Text")
+
+    local CircleCorner = Instance.new('UICorner')
+    CircleCorner.CornerRadius = UDim.new(1, 0)
+    CircleCorner.Parent = Circle
+
+    local currentState = initialValue
+    local function RefreshVisualState()
+        if currentState then
+            TrackThemeElement(ToggleButton, "BackgroundColor3", "Accent")
+            Circle.Position = UDim2.new(1, -15, 0.5, -6)
+        else
+            TrackThemeElement(ToggleButton, "BackgroundColor3", "MainBg")
+            Circle.Position = UDim2.new(0, 3, 0.5, -6)
+        end
+    end
+    RefreshVisualState()
+
+    ToggleButton.MouseButton1Click:Connect(function()
+        currentState = not currentState
+        RefreshVisualState()
+        callback(currentState)
+        if Settings.Autosave then SaveConfig() end
+    end)
+    
+    return {
+        SetState = function(newState)
+            currentState = newState
+            RefreshVisualState()
+        end
+    }
+end
+
+local function BuildDropdownSection(parent, sectionTitle)
+    local Container = Instance.new('Frame')
+    Container.Size = UDim2.new(1, 0, 0, 34)
+    Container.BorderSizePixel = 0
+    Container.ClipsDescendants = true
+    Container.Parent = parent
+    TrackThemeElement(Container, "BackgroundColor3", "CardBg")
+
+    local Corner = Instance.new('UICorner')
+    Corner.CornerRadius = UDim.new(0, 8)
+    Corner.Parent = Container
+
+    local Stroke = Instance.new('UIStroke')
+    Stroke.Thickness = 0.8
+    Stroke.Parent = Container
+    TrackThemeElement(Stroke, "Color", "Border")
+
+    local HeaderBtn = Instance.new('TextButton')
+    HeaderBtn.Size = UDim2.new(1, 0, 0, 34)
+    HeaderBtn.BackgroundTransparency = 1
+    HeaderBtn.Text = ""
+    HeaderBtn.Parent = Container
+
+    local TitleLabel = Instance.new('TextLabel')
+    TitleLabel.Size = UDim2.new(0.7, 0, 1, 0)
+    TitleLabel.Position = UDim2.new(0, 12, 0, 0)
+    TitleLabel.BackgroundTransparency = 1
+    TitleLabel.Text = sectionTitle
+    TitleLabel.Font = Enum.Font.GothamBold
+    TitleLabel.TextSize = 11
+    TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    TitleLabel.Parent = HeaderBtn
+    TrackThemeElement(TitleLabel, "TextColor3", "Text")
+
+    local ArrowIndicator = Instance.new('TextLabel')
+    ArrowIndicator.Size = UDim2.new(0, 20, 0, 20)
+    ArrowIndicator.Position = UDim2.new(1, -28, 0.5, -10)
+    ArrowIndicator.BackgroundTransparency = 1
+    ArrowIndicator.Text = "▼"
+    ArrowIndicator.Font = Enum.Font.GothamBold
+    ArrowIndicator.TextSize = 10
+    ArrowIndicator.Parent = HeaderBtn
+    TrackThemeElement(ArrowIndicator, "TextColor3", "Accent")
+
+    local ContentArea = Instance.new('Frame')
+    ContentArea.Size = UDim2.new(1, -24, 0, 0)
+    ContentArea.Position = UDim2.new(0, 12, 0, 38)
+    ContentArea.BackgroundTransparency = 1
+    ContentArea.Parent = Container
+
+    local ContentLayout = Instance.new('UIListLayout')
+    ContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    ContentLayout.Padding = UDim.new(0, 6)
+    ContentLayout.Parent = ContentArea
+
+    local isOpen = false
+
+    ContentLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        if isOpen then
+            Container.Size = UDim2.new(1, 0, 0, ContentLayout.AbsoluteContentSize.Y + 46)
+            ContentArea.Size = UDim2.new(1, -24, 0, ContentLayout.AbsoluteContentSize.Y)
+        end
+    end)
+
+    HeaderBtn.MouseButton1Click:Connect(function()
+        isOpen = not isOpen
+        ArrowIndicator.Text = isOpen and "▲" or "▼"
+        local targetHeight = isOpen and (ContentLayout.AbsoluteContentSize.Y + 46) or 34
+        TweenService:Create(Container, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(1, 0, 0, targetHeight)
+        }):Play()
+    end)
+
+    return ContentArea
+end
+
+local ActiveSliders = {}
+
+local function BuildSlider(parent, labelText, minVal, maxVal, defaultVal, callback)
+    local Frame = Instance.new('Frame')
+    Frame.Size = UDim2.new(1, 0, 0, 42)
+    Frame.BorderSizePixel = 0
+    Frame.Parent = parent
+    TrackThemeElement(Frame, "BackgroundColor3", "CardBg")
+
+    local Corner = Instance.new('UICorner')
+    Corner.CornerRadius = UDim.new(0, 8)
+    Corner.Parent = Frame
+
+    local Stroke = Instance.new('UIStroke')
+    Stroke.Thickness = 0.8
+    Stroke.Parent = Frame
+    TrackThemeElement(Stroke, "Color", "Border")
+
+    local Label = Instance.new('TextLabel')
+    Label.Size = UDim2.new(0.5, 0, 0, 18)
+    Label.Position = UDim2.new(0, 12, 0, 4)
+    Label.BackgroundTransparency = 1
+    Label.Text = labelText
+    Label.Font = Enum.Font.Gotham
+    Label.TextSize = 10
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+    Label.Parent = Frame
+    TrackThemeElement(Label, "TextColor3", "Text")
+
+    local ValBtn = Instance.new('TextButton')
+    ValBtn.Size = UDim2.new(0, 50, 0, 18)
+    ValBtn.Position = UDim2.new(1, -62, 0, 4)
+    ValBtn.BackgroundTransparency = 1
+    ValBtn.Text = ""
+    ValBtn.Parent = Frame
+
+    local ValBox = Instance.new('TextBox')
+    ValBox.Size = UDim2.new(1, 0, 1, 0)
+    ValBox.BackgroundTransparency = 1
+    ValBox.Text = tostring(defaultVal)
+    ValBox.Font = Enum.Font.GothamBold
+    ValBox.TextSize = 10
+    ValBox.TextXAlignment = Enum.TextXAlignment.Right
+    ValBox.Parent = ValBtn
+    TrackThemeElement(ValBox, "TextColor3", "SubText")
+
+    local Track = Instance.new('Frame')
+    Track.Size = UDim2.new(1, -24, 0, 4)
+    Track.Position = UDim2.new(0, 12, 1, -12)
+    Track.BorderSizePixel = 0
+    Track.Parent = Frame
+    TrackThemeElement(Track, "BackgroundColor3", "MainBg")
+
+    local TrackCorner = Instance.new('UICorner')
+    TrackCorner.CornerRadius = UDim.new(1, 0)
+    TrackCorner.Parent = Track
+
+    local FillBar = Instance.new('Frame')
+    FillBar.Size = UDim2.new((defaultVal - minVal)/(maxVal - minVal), 0, 1, 0)
+    FillBar.BorderSizePixel = 0
+    FillBar.Parent = Track
+    TrackThemeElement(FillBar, "BackgroundColor3", "Accent")
+
+    local FillCorner = Instance.new('UICorner')
+    FillCorner.CornerRadius = UDim.new(1, 0)
+    FillCorner.Parent = FillBar
+
+    local minLimit, maxLimit = minVal, maxVal
+
+    local function ApplySliderValue(value)
+        value = math.floor(value * 100) / 100
+        value = math.clamp(value, minLimit, maxLimit)
+        local positionRatio = (value - minLimit) / (maxLimit - minLimit)
+        FillBar.Size = UDim2.new(math.clamp(positionRatio, 0, 1), 0, 1, 0)
+        ValBox.Text = tostring(value)
+        callback(value)
+        if Settings.Autosave then SaveConfig() end
+    end
+
+    local function ComputeInputPosition(input)
+        local ratio = math.clamp((input.Position.X - Track.AbsolutePosition.X) / Track.AbsoluteSize.X, 0, 1)
+        local calculatedValue = minLimit + (maxLimit - minLimit) * ratio
+        ApplySliderValue(calculatedValue)
+    end
+
+    local isDraggingSlider = false
+    Track.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            isDraggingSlider = true
+            ComputeInputPosition(input)
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if isDraggingSlider and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            ComputeInputPosition(input)
+        end
+    end)
+
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            isDraggingSlider = false
+        end
+    end)
+
+    ValBox.FocusLost:Connect(function()
+        local parsedNumber = tonumber(ValBox.Text)
+        if parsedNumber then
+            ApplySliderValue(parsedNumber)
+        else
+            ApplySliderValue(defaultVal)
+        end
+    end)
+
+    local sliderController = {
+        UpdateBounds = function(newMin, newMax)
+            minLimit = newMin
+            maxLimit = newMax
+            local currentVal = tonumber(ValBox.Text) or defaultVal
+            if currentVal > newMax then currentVal = newMax end
+            ApplySliderValue(currentVal)
+        end
+    }
+
+    if labelText == "Hitbox Size" then
+        table.insert(ActiveSliders, sliderController)
+    end
+
+    return sliderController
+end
+
+local function BuildColorPickerButton(parent, labelText, initialColor, callback)
+    local Frame = Instance.new('Frame')
+    Frame.Size = UDim2.new(1, 0, 0, 30)
+    Frame.BorderSizePixel = 0
+    Frame.Parent = parent
+    TrackThemeElement(Frame, "BackgroundColor3", "CardBg")
+
+    local Corner = Instance.new('UICorner')
+    Corner.CornerRadius = UDim.new(0, 8)
+    Corner.Parent = Frame
+
+    local Stroke = Instance.new('UIStroke')
+    Stroke.Thickness = 0.8
+    Stroke.Parent = Frame
+    TrackThemeElement(Stroke, "Color", "Border")
+
+    local Label = Instance.new('TextLabel')
+    Label.Size = UDim2.new(0.6, 0, 1, 0)
+    Label.Position = UDim2.new(0, 12, 0, 0)
+    Label.BackgroundTransparency = 1
+    Label.Text = labelText
+    Label.Font = Enum.Font.Gotham
+    Label.TextSize = 10
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+    Label.Parent = Frame
+    TrackThemeElement(Label, "TextColor3", "Text")
+
+    local ColorBox = Instance.new('TextButton')
+    ColorBox.Size = UDim2.new(0, 36, 0, 16)
+    ColorBox.Position = UDim2.new(1, -48, 0.5, -8)
+    ColorBox.BackgroundColor3 = initialColor
+    ColorBox.Text = ""
+    ColorBox.Parent = Frame
+    AddButtonEffects(ColorBox)
+
+    local BoxCorner = Instance.new('UICorner')
+    BoxCorner.CornerRadius = UDim.new(0, 4)
+    BoxCorner.Parent = ColorBox
+
+    local BoxStroke = Instance.new('UIStroke')
+    BoxStroke.Thickness = 0.8
+    BoxStroke.Parent = ColorBox
+    TrackThemeElement(BoxStroke, "Color", "Border")
+
+    ColorBox.MouseButton1Click:Connect(function()
+        local h, s, v = initialColor:ToHSV()
+        activeHue, activeSat, activeVal = h, s, v
+        ColorSquare.BackgroundColor3 = Color3.fromHSV(activeHue, 1, 1)
+        ColorPickerModal.Position = UDim2.new(0, ColorBox.AbsolutePosition.X - 180, 0, ColorBox.AbsolutePosition.Y)
+        ColorPickerModal.Visible = true
+
+        ActiveColorCallback = function(newColor)
+            ColorBox.BackgroundColor3 = newColor
+            callback(newColor)
+            if Settings.Autosave then SaveConfig() end
+        end
+    end)
+end
+
+local function BuildStandardButton(parent, labelText, callback)
+    local Button = Instance.new('TextButton')
+    Button.Size = UDim2.new(1, 0, 0, 28)
+    Button.BorderSizePixel = 0
+    Button.Text = labelText
+    Button.Font = Enum.Font.GothamBold
+    Button.TextSize = 10
+    Button.Parent = parent
+    TrackThemeElement(Button, "BackgroundColor3", "CardBg")
+    TrackThemeElement(Button, "TextColor3", "Text")
+    AddButtonEffects(Button)
+
+    local Corner = Instance.new('UICorner')
+    Corner.CornerRadius = UDim.new(0, 8)
+    Corner.Parent = Button
+
+    local Stroke = Instance.new('UIStroke')
+    Stroke.Thickness = 0.8
+    Stroke.Parent = Button
+    TrackThemeElement(Stroke, "Color", "Border")
+
+    Button.MouseButton1Click:Connect(callback)
+end
+
+local function BuildDropdownMenu(parent, labelText, optionsList, defaultOption, isSearchable, callback)
+    local Container = Instance.new('Frame')
+    Container.Size = UDim2.new(1, 0, 0, 30)
+    Container.BorderSizePixel = 0
+    Container.ClipsDescendants = true
+    Container.Parent = parent
+    TrackThemeElement(Container, "BackgroundColor3", "CardBg")
+
+    local Corner = Instance.new('UICorner')
+    Corner.CornerRadius = UDim.new(0, 8)
+    Corner.Parent = Container
+
+    local Stroke = Instance.new('UIStroke')
+    Stroke.Thickness = 0.8
+    Stroke.Parent = Container
+    TrackThemeElement(Stroke, "Color", "Border")
+
+    local TopRow = Instance.new('Frame')
+    TopRow.Size = UDim2.new(1, 0, 0, 30)
+    TopRow.BackgroundTransparency = 1
+    TopRow.Parent = Container
+
+    local Label = Instance.new('TextLabel')
+    Label.Size = UDim2.new(0.5, 0, 1, 0)
+    Label.Position = UDim2.new(0, 12, 0, 0)
+    Label.BackgroundTransparency = 1
+    Label.Text = labelText
+    Label.Font = Enum.Font.Gotham
+    Label.TextSize = 10
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+    Label.Parent = TopRow
+    TrackThemeElement(Label, "TextColor3", "Text")
+
+    local SelectionBtn = Instance.new('TextButton')
+    SelectionBtn.Size = UDim2.new(0, 110, 0, 20)
+    SelectionBtn.Position = UDim2.new(1, -122, 0.5, -10)
+    SelectionBtn.BorderSizePixel = 0
+    SelectionBtn.Text = defaultOption .. " ▼"
+    SelectionBtn.Font = Enum.Font.GothamBold
+    SelectionBtn.TextSize = 9
+    SelectionBtn.Parent = TopRow
+    TrackThemeElement(SelectionBtn, "BackgroundColor3", "MainBg")
+    TrackThemeElement(SelectionBtn, "TextColor3", "Accent")
+
+    local BtnCorner = Instance.new('UICorner')
+    BtnCorner.CornerRadius = UDim.new(0, 4)
+    BtnCorner.Parent = SelectionBtn
+
+    local ScrollList = Instance.new('ScrollingFrame')
+    ScrollList.Size = UDim2.new(1, -24, 0, 130)
+    ScrollList.Position = UDim2.new(0, 12, 0, 32)
+    ScrollList.BackgroundTransparency = 1
+    ScrollList.ScrollBarThickness = 2
+    ScrollList.Parent = Container
+
+    local ListLayout = Instance.new('UIListLayout')
+    ListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    ListLayout.Padding = UDim.new(0, 2)
+    ListLayout.Parent = ScrollList
+
+    local searchField = nil
+    local optionItems = {}
+
+    if isSearchable then
+        searchField = Instance.new('TextBox')
+        searchField.Size = UDim2.new(1, 0, 0, 22)
+        searchField.BorderSizePixel = 0
+        searchField.PlaceholderText = "Search..."
+        searchField.Text = ""
+        searchField.Font = Enum.Font.Gotham
+        searchField.TextSize = 9
+        searchField.Parent = ScrollList
+        TrackThemeElement(searchField, "BackgroundColor3", "MainBg")
+        TrackThemeElement(searchField, "TextColor3", "Text")
+        TrackThemeElement(searchField, "PlaceholderColor3", "SubText")
+
+        local searchCorner = Instance.new('UICorner')
+        searchCorner.CornerRadius = UDim.new(0, 4)
+        searchCorner.Parent = searchField
+    end
+
+    local function ToggleMenuState()
+        local isOpen = Container.AbsoluteSize.Y <= 35
+        local currentText = SelectionBtn.Text:gsub(" [▲▼]", "")
+        SelectionBtn.Text = currentText .. (isOpen and " ▲" or " ▼")
+        
+        local contentHeight = math.min(ListLayout.AbsoluteContentSize.Y, 130)
+        local targetSize = isOpen and (36 + contentHeight) or 30
+        
+        TweenService:Create(Container, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Size = UDim2.new(1, 0, 0, targetSize)
+        }):Play()
+    end
+
+    for _, optionName in ipairs(optionsList) do
+        local OptButton = Instance.new('TextButton')
+        OptButton.Size = UDim2.new(1, 0, 0, 22)
+        OptButton.BorderSizePixel = 0
+        OptButton.Text = optionName
+        OptButton.Font = Enum.Font.Gotham
+        OptButton.TextSize = 9
+        OptButton.Parent = ScrollList
+        TrackThemeElement(OptButton, "BackgroundColor3", "MainBg")
+        TrackThemeElement(OptButton, "TextColor3", "SubText")
+
+        local optCorner = Instance.new('UICorner')
+        optCorner.CornerRadius = UDim.new(0, 4)
+        optCorner.Parent = OptButton
+
+        OptButton.MouseButton1Click:Connect(function()
+            SelectionBtn.Text = optionName .. " ▼"
+            callback(optionName)
+            ToggleMenuState()
+            if Settings.Autosave then SaveConfig() end
+        end)
+
+        table.insert(optionItems, {Button = OptButton, Name = optionName})
+    end
+
+    ListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        ScrollList.CanvasSize = UDim2.new(0, 0, 0, ListLayout.AbsoluteContentSize.Y)
+    end)
+
+    SelectionBtn.MouseButton1Click:Connect(ToggleMenuState)
+
+    if isSearchable and searchField then
+        searchField:GetPropertyChangedSignal("Text"):Connect(function()
+            local query = searchField.Text:lower()
+            for _, item in ipairs(optionItems) do
+                if query == "" or item.Name:lower():find(query) then
+                    item.Button.Visible = true
+                else
+                    item.Button.Visible = false
+                end
+            end
+        end)
+    end
+end
+
+-- Populating Menu Pages
+local TogglesDropdown = BuildDropdownSection(HitboxPage, "Toggles")
+
+BuildToggle(TogglesDropdown, "Expand Hitboxes", Settings.HitboxEnabled, function(state) Settings.HitboxEnabled = state end)
+BuildToggle(TogglesDropdown, "Target NPCs", Settings.TargetNPCs, function(state) Settings.TargetNPCs = state end)
+
+local RageModeToggle
+RageModeToggle = BuildToggle(TogglesDropdown, "Rage Mode (1-100 Size)", Settings.RageMode, function(state)
+    Settings.RageMode = state
+    local upperLimit = if state then 100 else 7
+    if not state and Settings.HitboxSize > 7 then
+        Settings.HitboxSize = 7
+    end
+    for _, slider in ipairs(ActiveSliders) do
+        slider.UpdateBounds(1, upperLimit)
+    end
+    if not state then
+        Settings.SpeedEnabled = false
+        Settings.FlyEnabled = false
+    end
+end)
+
+BuildToggle(TogglesDropdown, "Hitbox Outlines", Settings.OutlineEnabled, function(state) Settings.OutlineEnabled = state end)
+
+BuildSlider(HitboxPage, "Hitbox Size", 1, if Settings.RageMode then 100 else 7, Settings.HitboxSize, function(val)
+    if not Settings.RageMode and val > 7 then
+        val = 7
+        Settings.HitboxSize = 7
+        if RageModeToggle then RageModeToggle.SetState(false) end
+    else
+        Settings.HitboxSize = val
+    end
+end)
+
+BuildColorPickerButton(HitboxPage, "Hitbox Color", Color3.fromRGB(unpack(Settings.HitboxColor)), function(col)
+    Settings.HitboxColor = {math.floor(col.R * 255), math.floor(col.G * 255), math.floor(col.B * 255)}
+end)
+BuildSlider(HitboxPage, "Hitbox Opacity", 0, 1, Settings.HitboxOpacity, function(val) Settings.HitboxOpacity = val end)
+BuildColorPickerButton(HitboxPage, "Outline Color", Color3.fromRGB(unpack(Settings.OutlineColor)), function(col)
+    Settings.OutlineColor = {math.floor(col.R * 255), math.floor(col.G * 255), math.floor(col.B * 255)}
+end)
+BuildSlider(HitboxPage, "Outline Thickness", 0, 0.5, Settings.OutlineThickness, function(val) Settings.OutlineThickness = val end)
+BuildSlider(HitboxPage, "Outline Opacity", 0, 1, Settings.OutlineOpacity, function(val) Settings.OutlineOpacity = val end)
+
+local function RefreshCharacterHead()
+    local character = LocalPlayer.Character
+    if not character then return end
+    
+    local headPart = character:FindFirstChild("Head")
+    if headPart then
+        local targetTransparency = Settings.Headless and 1 or 0
+        headPart.Transparency = targetTransparency
+        for _, child in ipairs(headPart:GetChildren()) do
+            if child:IsA("Decal") then child.Transparency = targetTransparency end
+        end
+    end
+end
+
+BuildToggle(PlayerPage, "Headless (Local)", Settings.Headless, function(state)
+    Settings.Headless = state
+    RefreshCharacterHead()
+end)
+
+local SpeedToggle
+SpeedToggle = BuildToggle(PlayerPage, "Speed (Requires Rage)", Settings.SpeedEnabled, function(state)
+    if not Settings.RageMode then
+        SpeedToggle.SetState(false)
+        Settings.SpeedEnabled = false
+        return
+    end
+    Settings.SpeedEnabled = state
+end)
+
+BuildSlider(PlayerPage, "Speed Value", 16, 150, Settings.SpeedValue, function(val)
+    Settings.SpeedValue = val
+end)
+
+local FlyToggle
+FlyToggle = BuildToggle(PlayerPage, "Fly (Requires Rage)", Settings.FlyEnabled, function(state)
+    if not Settings.RageMode then
+        FlyToggle.SetState(false)
+        Settings.FlyEnabled = false
+        return
+    end
+    Settings.FlyEnabled = state
+end)
+
+BuildSlider(PlayerPage, "Fly Speed", 20, 300, Settings.FlySpeed, function(val)
+    Settings.FlySpeed = val
+end)
+
+LocalPlayer.CharacterAdded:Connect(function()
+    task.delay(1, RefreshCharacterHead)
+end)
+
+BuildSlider(LightingPage, "Fog Start", 0, 1000, Settings.FogStart, function(val)
+    Settings.FogStart = val
+    Lighting.FogStart = val
+end)
+BuildSlider(LightingPage, "Fog End", 100, 10000, Settings.FogEnd, function(val)
+    Settings.FogEnd = val
+    Lighting.FogEnd = val
+end)
+BuildColorPickerButton(LightingPage, "Fog Color", Color3.fromRGB(unpack(Settings.FogColor)), function(col)
+    Settings.FogColor = {math.floor(col.R * 255), math.floor(col.G * 255), math.floor(col.B * 255)}
+    Lighting.FogColor = col
+end)
+BuildColorPickerButton(LightingPage, "Ambient Light", Color3.fromRGB(unpack(Settings.Ambient)), function(col)
+    Settings.Ambient = {math.floor(col.R * 255), math.floor(col.G * 255), math.floor(col.B * 255)}
+    Lighting.Ambient = col
+end)
+BuildColorPickerButton(LightingPage, "Outdoor Ambient", Color3.fromRGB(unpack(Settings.OutdoorAmbient)), function(col)
+    Settings.OutdoorAmbient = {math.floor(col.R * 255), math.floor(col.G * 255), math.floor(col.B * 255)}
+    Lighting.OutdoorAmbient = col
+end)
+
+if not IsMobile and SettingsPage then
+    BuildToggle(SettingsPage, "Auto-Load Config on Launch", Settings.AutoLoad, function(state) 
+        Settings.AutoLoad = state 
+        if Settings.Autosave then SaveConfig() end
+    end)
+
+    BuildToggle(SettingsPage, "Autosave Changes", Settings.Autosave, function(state) 
+        Settings.Autosave = state 
+        if state then SaveConfig() end
+    end)
+
+    local ThemeNames = {"Dark", "Midnight", "Blood", "PastelPink", "PastelBlue", "Emerald", "Cyberpunk", "Monochrome", "Sakura", "Sunset", "Matrix", "Lavender", "Solarized", "Coffee", "NeonMint", "RoyalGold"}
+    BuildDropdownMenu(SettingsPage, "UI Theme", ThemeNames, Settings.Theme, true, function(selectedTheme)
+        SwitchTheme(selectedTheme)
+    end)
+
+    BuildStandardButton(SettingsPage, "Save Configuration", SaveConfig)
+    BuildStandardButton(SettingsPage, "Load Configuration", LoadConfig)
+end
+
+-- Tab Switching Helper
+local function SwitchActiveTab(targetPage, targetButton)
+    HitboxPage.Visible = false
+    PlayerPage.Visible = false
+    LightingPage.Visible = false
+    if SettingsPage then SettingsPage.Visible = false end
+
+    TrackThemeElement(HitboxTabBtn, "BackgroundColor3", "CardBg")
+    TrackThemeElement(HitboxTabBtn, "TextColor3", "SubText")
+    TrackThemeElement(PlayerTabBtn, "BackgroundColor3", "CardBg")
+    TrackThemeElement(PlayerTabBtn, "TextColor3", "SubText")
+    TrackThemeElement(LightingTabBtn, "BackgroundColor3", "CardBg")
+    TrackThemeElement(LightingTabBtn, "TextColor3", "SubText")
+    if SettingsTabBtn then
+        TrackThemeElement(SettingsTabBtn, "BackgroundColor3", "CardBg")
+        TrackThemeElement(SettingsTabBtn, "TextColor3", "SubText")
+    end
+
+    targetPage.Visible = true
+    TrackThemeElement(targetButton, "BackgroundColor3", "Accent")
+    TrackThemeElement(targetButton, "TextColor3", "Text")
+end
+
+HitboxTabBtn.MouseButton1Click:Connect(function() SwitchActiveTab(HitboxPage, HitboxTabBtn) end)
+PlayerTabBtn.MouseButton1Click:Connect(function() SwitchActiveTab(PlayerPage, PlayerTabBtn) end)
+LightingTabBtn.MouseButton1Click:Connect(function() SwitchActiveTab(LightingPage, LightingTabBtn) end)
+if SettingsTabBtn then
+    SettingsTabBtn.MouseButton1Click:Connect(function() SwitchActiveTab(SettingsPage, SettingsTabBtn) end)
+end
+
+-- Hotkey Listeners
+if not IsMobile then
+    UserInputService.InputBegan:Connect(function(input, gameProcessed)
+        if isBindingKey and input.UserInputType == Enum.UserInputType.Keyboard then
+            isBindingKey = false
+            if input.KeyCode == Enum.KeyCode.RightBracket or input.KeyCode.LeftBracket or input.KeyCode.Backspace or input.KeyCode.Delete or input.KeyCode.Escape then
+                Settings.ToggleKey = "None"
+                KeybindButton.Text = "None"
+            else
+                Settings.ToggleKey = input.KeyCode.Name
+                KeybindButton.Text = Settings.ToggleKey
+            end
+            if Settings.Autosave then SaveConfig() end
+            return
+        end
+
+        if not gameProcessed and input.UserInputType == Enum.UserInputType.Keyboard then
+            local pressedKeyName = input.KeyCode.Name
+            if pressedKeyName == Settings.ToggleKey then
+                ToggleWindowVisibility(not isUIVisible)
+            elseif pressedKeyName == Settings.SpeedKey and Settings.RageMode then
+                Settings.SpeedEnabled = not Settings.SpeedEnabled
+                if SpeedToggle then SpeedToggle.SetState(Settings.SpeedEnabled) end
+            elseif pressedKeyName == Settings.FlyKey and Settings.RageMode then
+                Settings.FlyEnabled = not Settings.FlyEnabled
+                if FlyToggle then FlyToggle.SetState(Settings.FlyEnabled) end
+            end
+        end
+    end)
+end
+
+-- Core Game Loop (Hitbox expansion, flight mechanics, and performance tracking)
+local SavedPartProperties = {}
+local CachedTargetParts = {}
+local CacheTimer = 0
+
+local activeFlyVelocity, activeFlyGyro
+local function CleanUpFlight()
+    if activeFlyVelocity then activeFlyVelocity:Destroy() activeFlyVelocity = nil end
+    if activeFlyGyro then activeFlyGyro:Destroy() activeFlyGyro = nil end
+end
+
+RunService.Heartbeat:Connect(function(deltaTime)
+    local character = LocalPlayer.Character
+    if character and character:FindFirstChild("Humanoid") then
+        local humanoid = character.Humanoid
+        local rootPart = character:FindFirstChild("HumanoidRootPart")
+        
+        if Settings.RageMode and Settings.SpeedEnabled then
+            humanoid.WalkSpeed = Settings.SpeedValue
+        end
+
+        if Settings.RageMode and Settings.FlyEnabled and rootPart then
+            if not activeFlyVelocity then
+                activeFlyVelocity = Instance.new("BodyVelocity")
+                activeFlyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+                activeFlyVelocity.Velocity = Vector3.new(0, 0, 0)
+                activeFlyVelocity.Parent = rootPart
+
+                activeFlyGyro = Instance.new("BodyGyro")
+                activeFlyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+                activeFlyGyro.CFrame = rootPart.CFrame
+                activeFlyGyro.Parent = rootPart
+            end
+            
+            local cameraCF = Camera.CFrame
+            local direction = Vector3.new()
+            if UserInputService:IsKeyDown(Enum.KeyCode.W) then direction = direction + cameraCF.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.S) then direction = direction - cameraCF.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.A) then direction = direction - cameraCF.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.D) then direction = direction + cameraCF.RightVector end
+            
+            activeFlyVelocity.Velocity = direction * Settings.FlySpeed
+            activeFlyGyro.CFrame = cameraCF
+        else
+            CleanUpFlight()
+        end
+    else
+        CleanUpFlight()
+    end
+
+    -- Periodically update target cache to save system resources
+    CacheTimer = CacheTimer + deltaTime
+    if CacheTimer >= 1.0 then
+        CacheTimer = 0
+        table.clear(CachedTargetParts)
+
+        if Settings.HitboxEnabled then
+            for _, player in ipairs(Players:GetPlayers()) do
+                if player ~= LocalPlayer and player.Character then
+                    local targetRoot = player.Character:FindFirstChild("HumanoidRootPart") or player.Character:FindFirstChild("Torso")
+                    if targetRoot and (not LocalPlayer.Character or targetRoot.Parent ~= LocalPlayer.Character) then 
+                        table.insert(CachedTargetParts, targetRoot) 
+                    end
+                end
+            end
+
+            if Settings.TargetNPCs then
+                for _, model in ipairs(workspace:GetChildren()) do
+                    if model:IsA("Model") and model ~= LocalPlayer.Character and not Players:GetPlayerFromCharacter(model) then
+                        if model:FindFirstChildOfClass("Humanoid") then
+                            local targetRoot = model:FindFirstChild("HumanoidRootPart") or model:FindFirstChild("Torso")
+                            if targetRoot then table.insert(CachedTargetParts, targetRoot) end
+                        end
+                    elseif model:IsA("Folder") then
+                        for _, subModel in ipairs(model:GetChildren()) do
+                            if subModel:IsA("Model") and subModel ~= LocalPlayer.Character and subModel:FindFirstChildOfClass("Humanoid") then
+                                local targetRoot = subModel:FindFirstChild("HumanoidRootPart") or subModel:FindFirstChild("Torso")
+                                if targetRoot then table.insert(CachedTargetParts, targetRoot) end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    if not Settings.HitboxEnabled then
+        if next(SavedPartProperties) ~= nil then
+            for part, original in pairs(SavedPartProperties) do
+                if part and part.Parent then
+                    part.Size = original.Size
+                    part.Transparency = original.Transparency
+                    part.CanCollide = original.CanCollide
+                    part.Color = original.Color
+                    part.Material = original.Material
+                    local outlineBox = part:FindFirstChild("CakepopAdornment")
+                    if outlineBox then outlineBox:Destroy() end
+                end
+            end
+            table.clear(SavedPartProperties)
+            table.clear(CachedTargetParts)
+        end
+        return
+    end
+
+    local expandedSize = Vector3.new(Settings.HitboxSize, Settings.HitboxSize, Settings.HitboxSize)
+    local selectedHitboxColor = Color3.fromRGB(unpack(Settings.HitboxColor))
+    local computedTransparency = 1 - Settings.HitboxOpacity
+    local selectedOutlineColor = Color3.fromRGB(unpack(Settings.OutlineColor))
+    local activePartsThisTick = {}
+
+    for _, rootPart in ipairs(CachedTargetParts) do
+        if rootPart and rootPart.Parent then
+            activePartsThisTick[rootPart] = true
+            
+            if not SavedPartProperties[rootPart] then
+                SavedPartProperties[rootPart] = {
+                    Size = rootPart.Size,
+                    Transparency = rootPart.Transparency,
+                    CanCollide = rootPart.CanCollide,
+                    Color = rootPart.Color,
+                    Material = rootPart.Material
+                }
+            end
+
+            if rootPart.Size ~= expandedSize then rootPart.Size = expandedSize end
+            if rootPart.Transparency ~= computedTransparency then rootPart.Transparency = computedTransparency end
+            if rootPart.Color ~= selectedHitboxColor then rootPart.Color = selectedHitboxColor end
+            if rootPart.CanCollide ~= false then rootPart.CanCollide = false end
+            if rootPart.Material ~= Enum.Material.SmoothPlastic then rootPart.Material = Enum.Material.SmoothPlastic end
+
+            local outlineBox = rootPart:FindFirstChild("CakepopAdornment")
+            if Settings.OutlineEnabled then
+                if not outlineBox then
+                    outlineBox = Instance.new("SelectionBox")
+                    outlineBox.Name = "CakepopAdornment"
+                    outlineBox.Adornee = rootPart
+                    outlineBox.Parent = rootPart
+                end
+                if outlineBox.Color3 ~= selectedOutlineColor then outlineBox.Color3 = selectedOutlineColor end
+                if outlineBox.LineThickness ~= Settings.OutlineThickness then outlineBox.LineThickness = Settings.OutlineThickness end
+                if outlineBox.Transparency ~= (1 - Settings.OutlineOpacity) then outlineBox.Transparency = 1 - Settings.OutlineOpacity end
+            else
+                if outlineBox then outlineBox:Destroy() end
+            end
+        end
+    end
+
+    -- revert parts that are no longer targeted
+    for part, original in pairs(SavedPartProperties) do
+        if not activePartsThisTick[part] then
+            if part and part.Parent then
+                part.Size = original.Size
+                part.Transparency = original.Transparency
+                part.CanCollide = original.CanCollide
+                part.Color = original.Color
+                part.Material = original.Material
+                local outlineBox = part:FindFirstChild("CakepopAdornment")
+                if outlineBox then outlineBox:Destroy() end
+            end
+            SavedPartProperties[part] = nil
+        end
+    end
+end)
